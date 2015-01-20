@@ -90,11 +90,8 @@ testing_data &lt;- testDataSmall[ , !apply(is.na(testDataSmall), 2, any)]</code>
 training &lt;- training_data[inTrain,]
 CVtesting &lt;- training_data[-inTrain,]</code></pre>
 <p>Next I set the seed for replication. I then perform cross-validation while training the model on the new training set and predict outcomes on the data we set aside for cross-validation within the training set. The accuracy is 99.2% and an estimate of error rate of .67%</p>
-<pre class="r"><code>set.seed(1000)
-cvControl = trainControl(method='cv',number=5,repeats=2,returnResamp='none')
-modelFit &lt;- train(training$classe~.,data=training,method=&quot;rf&quot;, trControl=cvControl)</code></pre>
-<pre><code>## Loading required package: randomForest
-## randomForest 4.6-10
+<pre class="r"><code>library(randomForest)</code></pre>
+<pre><code>## randomForest 4.6-10
 ## Type rfNews() to see new features/changes/bug fixes.
 ## 
 ## Attaching package: 'randomForest'
@@ -102,56 +99,60 @@ modelFit &lt;- train(training$classe~.,data=training,method=&quot;rf&quot;, trCo
 ## The following object is masked from 'package:Hmisc':
 ## 
 ##     combine</code></pre>
-<pre class="r"><code>predictions &lt;- predict(modelFit,newdata=CVtesting)
+<pre class="r"><code>library(caret)
+set.seed(1000)
+cvControl = trainControl(method='cv',number=5,repeats=2,returnResamp='none')
+modelFit &lt;- train(training$classe~.,data=training,method=&quot;rf&quot;, trControl=cvControl)
+predictions &lt;- predict(modelFit,newdata=CVtesting)
 
 confusionMatrix(predictions,CVtesting$classe)</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1388    4    0    0    0
-##          B    5  944    7    0    2
-##          C    1    1  845    7    0
-##          D    0    0    3  796    1
-##          E    1    0    0    1  898
+##          A 1395    2    0    0    0
+##          B    0  944    5    0    0
+##          C    0    3  850   16    1
+##          D    0    0    0  787    1
+##          E    0    0    0    1  899
 ## 
 ## Overall Statistics
-##                                           
-##                Accuracy : 0.9933          
-##                  95% CI : (0.9906, 0.9954)
-##     No Information Rate : 0.2845          
-##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
-##                                           
-##                   Kappa : 0.9915          
-##  Mcnemar's Test P-Value : NA              
+##                                          
+##                Accuracy : 0.9941         
+##                  95% CI : (0.9915, 0.996)
+##     No Information Rate : 0.2845         
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
+##                                          
+##                   Kappa : 0.9925         
+##  Mcnemar's Test P-Value : NA             
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9950   0.9947   0.9883   0.9900   0.9967
-## Specificity            0.9989   0.9965   0.9978   0.9990   0.9995
-## Pos Pred Value         0.9971   0.9854   0.9895   0.9950   0.9978
-## Neg Pred Value         0.9980   0.9987   0.9975   0.9981   0.9993
+## Sensitivity            1.0000   0.9947   0.9942   0.9789   0.9978
+## Specificity            0.9994   0.9987   0.9951   0.9998   0.9998
+## Pos Pred Value         0.9986   0.9947   0.9770   0.9987   0.9989
+## Neg Pred Value         1.0000   0.9987   0.9988   0.9959   0.9995
 ## Prevalence             0.2845   0.1935   0.1743   0.1639   0.1837
-## Detection Rate         0.2830   0.1925   0.1723   0.1623   0.1831
-## Detection Prevalence   0.2838   0.1954   0.1741   0.1631   0.1835
-## Balanced Accuracy      0.9969   0.9956   0.9930   0.9945   0.9981</code></pre>
+## Detection Rate         0.2845   0.1925   0.1733   0.1605   0.1833
+## Detection Prevalence   0.2849   0.1935   0.1774   0.1607   0.1835
+## Balanced Accuracy      0.9997   0.9967   0.9946   0.9893   0.9988</code></pre>
 <pre class="r"><code>modelFit$finalModel</code></pre>
 <pre><code>## 
 ## Call:
 ##  randomForest(x = x, y = y, mtry = param$mtry) 
 ##                Type of random forest: classification
 ##                      Number of trees: 500
-## No. of variables tried at each split: 27
+## No. of variables tried at each split: 2
 ## 
-##         OOB estimate of  error rate: 0.6%
+##         OOB estimate of  error rate: 0.74%
 ## Confusion matrix:
-##      A    B    C    D    E class.error
-## A 4179    5    0    0    1 0.001433692
-## B   20 2823    5    0    0 0.008778090
-## C    0   13 2545    9    0 0.008570316
-## D    0    1   26 2384    1 0.011608624
-## E    0    0    6    2 2698 0.002956393</code></pre>
+##      A    B    C    D    E  class.error
+## A 4181    3    0    0    1 0.0009557945
+## B   21 2819    8    0    0 0.0101825843
+## C    0   20 2542    5    0 0.0097389949
+## D    0    0   42 2369    1 0.0178275290
+## E    0    0    3    5 2698 0.0029563932</code></pre>
 <p>Then I run the model on the seperate testing data. When submitting the predicted answers, the predictions were all accurate.</p>
 <pre class="r"><code>predictionsTest &lt;- predict(modelFit,newdata=testing_data)</code></pre>
 

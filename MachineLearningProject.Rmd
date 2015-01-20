@@ -43,6 +43,8 @@ CVtesting <- training_data[-inTrain,]
 ```
 Next I set the seed for replication. I then perform cross-validation while training the model on the new training set and predict outcomes on the data we set aside for cross-validation within the training set. The accuracy is 99.2% and an estimate of error rate of .67%
 ```{r}
+library(randomForest)
+library(caret)
 set.seed(1000)
 cvControl = trainControl(method='cv',number=5,repeats=2,returnResamp='none')
 modelFit <- train(training$classe~.,data=training,method="rf", trControl=cvControl)
